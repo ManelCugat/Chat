@@ -1,9 +1,7 @@
 package manel.sockets;
 
-import java.awt.*;
 import java.awt.event.*;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.*;
 import javax.swing.*;
 
@@ -24,14 +22,11 @@ public class Cliente {
 
 class MarcoCliente extends JFrame{
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public MarcoCliente(){
 		
-		this.setBounds(300, 300, 400, 550);
+		this.setBounds(300, 300, 400, 450);
 		
 		this.setTitle("Cliente");
 		
@@ -50,31 +45,37 @@ class MarcoCliente extends JFrame{
 class LaminaCliente extends JPanel{
 	
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public LaminaCliente(){
 		
 		
-		this.setLayout(new BorderLayout());
+		nick=new JTextField(10 );
+	
+		JLabel etiqueta=new JLabel("--CHAT--", JLabel.CENTER);
 		
-		JLabel etiqueta=new JLabel("CLIENTE", JLabel.CENTER);
+		ip = new JTextField(10);
+	
+		textoEnvio =new JTextField (30);
+	
+		campoChat=new JTextArea (20,30);
 		
-		textoEnvio =new JTextField (20);
-		
-		JButton botonEnvio=new JButton("Enviar");
+		botonEnvio=new JButton("Enviar");
 		
 		botonEnvio.addActionListener(new EnviaTexto());
 		
-		this.add(etiqueta, BorderLayout.NORTH);
+		this.add(nick);
 		
-		this.add(textoEnvio,BorderLayout.CENTER);
+		this.add(etiqueta);
 		
-		this.add(botonEnvio, BorderLayout.SOUTH);
+		this.add(ip);
 		
+		this.add(campoChat);
 		
+		this.add(textoEnvio);
+		
+		this.add(botonEnvio);
+	
 	}
 	
 	private class EnviaTexto implements ActionListener{
@@ -86,8 +87,19 @@ class LaminaCliente extends JPanel{
 			try {
 				
 				miSocket=new Socket("192.168.1.99",9999);
-				DataOutputStream flujo_salida = new DataOutputStream(miSocket.getOutputStream());
-				flujo_salida.writeUTF(textoEnvio.getText());
+				
+				PaqueteEnvio datos=new PaqueteEnvio();
+						
+				datos.setNick(nick.getText());
+				
+				datos.setIp(ip.getText());
+				
+				datos.setMensaje(textoEnvio.getText());
+				
+				ObjectOutputStream paquete_envio = new ObjectOutputStream (miSocket.getOutputStream());
+				
+				paquete_envio.writeObject(datos);
+
 				miSocket.close();
 				
 			} catch (IOException e1) {
@@ -100,6 +112,48 @@ class LaminaCliente extends JPanel{
 		
 	}
 	
-	JTextField textoEnvio;
+	JTextField textoEnvio, nick, ip;
+	JButton botonEnvio;
+	private JTextArea campoChat;
+	
+}
+
+
+class PaqueteEnvio implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
+	
+	private String nick, ip, mensaje;
+	
+	public PaqueteEnvio(){}
+	
+	public String getNick() {
+		return nick;
+	}
+
+	public void setNick(String nick) {
+		this.nick = nick;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public String getMensaje() {
+		return mensaje;
+	}
+
+	public void setMensaje(String mensaje) {
+		this.mensaje = mensaje;
+	}
+
+	
+
+	
+	
 	
 }
