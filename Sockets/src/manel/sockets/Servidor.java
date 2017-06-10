@@ -23,9 +23,6 @@ public class Servidor {
 
 class MarcoServidor extends JFrame{
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public MarcoServidor(){
@@ -59,10 +56,6 @@ LaminaServidor laminaCliente;
 
 class LaminaServidor extends JPanel implements Runnable{
 	
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public LaminaServidor(){
@@ -87,18 +80,38 @@ class LaminaServidor extends JPanel implements Runnable{
 				
 				@SuppressWarnings("resource")
 				ServerSocket socketServidor=new ServerSocket(9999);
+				
+				String nick,ip,mensaje;
+				
+				PaqueteEnvio paquete_recibido;
 			
 				while (true){
 				
-				Socket misocket=socketServidor.accept();
-			
-				DataInputStream textoEntrada=new DataInputStream (misocket.getInputStream());
-			
-				String texto=textoEntrada.readUTF();
+					Socket misocket=socketServidor.accept();
 				
-				areaTexto.append(texto + "\n");
+					ObjectInputStream objeto_recibido=new ObjectInputStream(misocket.getInputStream());
+			
+					paquete_recibido=(PaqueteEnvio) objeto_recibido.readObject();
 				
-				misocket.close();
+					nick=paquete_recibido.getNick();
+				
+					ip=paquete_recibido.getIp();
+				
+					mensaje=paquete_recibido.getMensaje();
+				
+					areaTexto.append(nick +": " + mensaje + " para: " + ip + "\n");
+				
+					misocket.close();
+				
+					//El servidor reenvia el mensaje al cliente destinatario
+					
+					Socket envia_destinatario=new Socket (ip,9090);
+					
+					ObjectOutputStream paquete_reenvio=new ObjectOutputStream(envia_destinatario.getOutputStream());
+					
+					paquete_reenvio.writeObject(paquete_recibido);
+					
+					envia_destinatario.close();
 				
 				}
 			
@@ -106,6 +119,10 @@ class LaminaServidor extends JPanel implements Runnable{
 
 				System.out.println("-----------Problemas creando Socket Servidor --------- \n "+e);
 		
+			} catch (ClassNotFoundException e){
+				
+				System.out.println("-----------Problemas recibiendo paquete en servidor --------- \n "+e);
+				
 			}
 		}
 	

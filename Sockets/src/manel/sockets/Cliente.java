@@ -96,11 +96,15 @@ class LaminaCliente extends JPanel{
 				
 				datos.setMensaje(textoEnvio.getText());
 				
+				textoEnvio.setText("");
+				
 				ObjectOutputStream paquete_envio = new ObjectOutputStream (miSocket.getOutputStream());
 				
 				paquete_envio.writeObject(datos);
 
 				miSocket.close();
+				
+
 				
 			} catch (IOException e1) {
 
@@ -151,9 +155,5 @@ class PaqueteEnvio implements Serializable{
 		this.mensaje = mensaje;
 	}
 
-	
 
-	
-	
-	
 }
