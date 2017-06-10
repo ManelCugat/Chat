@@ -24,6 +24,11 @@ public class Cliente {
 
 class MarcoCliente extends JFrame{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public MarcoCliente(){
 		
 		this.setBounds(300, 300, 400, 550);
@@ -45,6 +50,11 @@ class MarcoCliente extends JFrame{
 class LaminaCliente extends JPanel{
 	
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public LaminaCliente(){
 		
 		

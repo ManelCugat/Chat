@@ -23,6 +23,11 @@ public class Servidor {
 
 class MarcoServidor extends JFrame{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public MarcoServidor(){
 		
 		
@@ -55,6 +60,11 @@ LaminaServidor laminaCliente;
 class LaminaServidor extends JPanel implements Runnable{
 	
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public LaminaServidor(){
 		
 		
@@ -75,6 +85,7 @@ class LaminaServidor extends JPanel implements Runnable{
 
 			try {
 				
+				@SuppressWarnings("resource")
 				ServerSocket socketServidor=new ServerSocket(9999);
 			
 				while (true){
@@ -96,7 +107,6 @@ class LaminaServidor extends JPanel implements Runnable{
 				System.out.println("-----------Problemas creando Socket Servidor --------- \n "+e);
 		
 			}
-		
 		}
 	
 	JTextArea areaTexto;
