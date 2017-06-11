@@ -97,6 +97,8 @@ class LaminaServidor extends JPanel implements Runnable{
 					try{
 					
 					Socket misocket = socketServidor.accept();
+					
+					System.out.println("Conexion aceptada del: "+misocket.getInetAddress());
 			
 					ObjectInputStream objeto_recibido = new ObjectInputStream(misocket.getInputStream());
 			

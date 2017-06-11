@@ -1,5 +1,7 @@
 package manel.sockets;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
@@ -13,7 +15,6 @@ public class Cliente {
 		MarcoCliente marcoCliente=new MarcoCliente();
 		
 		marcoCliente.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 
 	}
 
@@ -58,6 +59,8 @@ class LaminaCliente extends JPanel{
 	
 		campoChat=new JTextArea (20,30);
 		
+		JScrollPane scroll = new JScrollPane(campoChat);
+
 		botonEnvio=new JButton("Enviar");
 		
 		botonEnvio.addActionListener(new EnviaTexto());
@@ -72,7 +75,7 @@ class LaminaCliente extends JPanel{
 		
 		this.add(ip);
 		
-		this.add(campoChat);
+		this.add(scroll);
 		
 		this.add(textoEnvio);
 		
@@ -97,6 +100,8 @@ class LaminaCliente extends JPanel{
 				
 				miSocket=new Socket("192.168.1.99",9999);
 				
+
+				
 				PaqueteEnvio datos=new PaqueteEnvio();
 						
 				datos.setNick(nick_entrada);
@@ -104,20 +109,18 @@ class LaminaCliente extends JPanel{
 				datos.setIp(ip.getText());
 				
 				datos.setMensaje(textoEnvio.getText());
-				
-				campoChat.append(nick_entrada + ": " +textoEnvio.getText() + "\n");
-				
-				textoEnvio.setText("");
-				
+			
 				ObjectOutputStream paquete_envio = new ObjectOutputStream (miSocket.getOutputStream());
 				
 				paquete_envio.writeObject(datos);
-				
+			
 				paquete_envio.close();
 				
-				paquete_envio.close();
-
 				miSocket.close();
+					
+				campoChat.append(nick_entrada + ": " +textoEnvio.getText() + "\n");
+				
+				textoEnvio.setText("");
 				
 			} catch (IOException e1) {
 
@@ -127,7 +130,7 @@ class LaminaCliente extends JPanel{
 			}
 		}
 		
-	Socket miSocket;	
+	Socket miSocket;
 		
 	}
 	
@@ -146,9 +149,11 @@ class LaminaCliente extends JPanel{
 				ServerSocket server_recepcion = new ServerSocket(9090);
 			
 				while(true){
-				
+					
 					Socket socket_recepcion=server_recepcion.accept();
-				
+					
+					
+			
 					ObjectInputStream objeto_recibido = new ObjectInputStream (socket_recepcion.getInputStream());
 				
 					paquete_recibido= (PaqueteEnvio) objeto_recibido.readObject();
@@ -156,8 +161,13 @@ class LaminaCliente extends JPanel{
 					nick=paquete_recibido.getNick();
 					ip=paquete_recibido.getIp();
 					mensaje=paquete_recibido.getMensaje();
+			
+					InetAddress ipHost= InetAddress.getLocalHost();
 				
 					campoChat.append(nick + ": " + mensaje + "\n");
+					campoChat.append("ip local: " + ipHost.getHostAddress() + "\n");
+					campoChat.append("ip recepcion: " + socket_recepcion.getInetAddress() + "\n");
+					
 				
 					//server_recepcion.close();
 				
@@ -176,10 +186,12 @@ class LaminaCliente extends JPanel{
 		
 	}
 	
+	
 	private String nick_entrada;
 	private JTextField textoEnvio, nick, ip;
 	private JButton botonEnvio;
 	private JTextArea campoChat;
+
 	
 }
 
