@@ -3,6 +3,8 @@ package manel.sockets;
 import java.awt.*;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.*;
 
@@ -53,10 +55,12 @@ LaminaServidor laminaCliente;
 	
 }
 
-
 class LaminaServidor extends JPanel implements Runnable{
 	
 	private static final long serialVersionUID = 1L;
+	JTextArea areaTexto;
+	ArrayList <UsuarioOnline> usuariosOnline = new ArrayList <UsuarioOnline>();
+	
 
 	public LaminaServidor(){
 		
@@ -73,9 +77,9 @@ class LaminaServidor extends JPanel implements Runnable{
 		
 	}
 	
+
 	public void run() {
-		
-				
+	
 
 				ServerSocket socketServidor = null;
 				
@@ -91,14 +95,13 @@ class LaminaServidor extends JPanel implements Runnable{
 				String ip=null;
 				String mensaje=null;
 				PaqueteEnvio paquete_recibido=null;
+				InetAddress ipReceptor;
 			
 				while (true){
 				
 					try{
 					
 					Socket misocket = socketServidor.accept();
-					
-					System.out.println("Conexion aceptada del: "+misocket.getInetAddress());
 			
 					ObjectInputStream objeto_recibido = new ObjectInputStream(misocket.getInputStream());
 			
@@ -109,9 +112,31 @@ class LaminaServidor extends JPanel implements Runnable{
 					ip=paquete_recibido.getIp();
 				
 					mensaje=paquete_recibido.getMensaje();
+					
+					ipReceptor=misocket.getInetAddress();
+					
+					System.out.println("ip del receptor: " + ipReceptor);
+					
+					UsuarioOnline uo=new UsuarioOnline(nick,ipReceptor);
+					
+					System.out.println("Creado usuario: " + uo.getNickName());
+					
+					if (!compruebaOnline(uo,ipReceptor)){
+						
+						areaTexto.append(nick + " con ip: " + ipReceptor + " ONLINE\n");
+						usuariosOnline.add(uo);
+			
+					}else areaTexto.append(nick +": " + mensaje + " para: " + ip + "\n");
 				
-					areaTexto.append(nick +": " + mensaje + " para: " + ip + "\n");
-				
+					
+					/*System.out.println("________ONLINE USERS_______");
+					
+					for (UsuarioOnline onlineUser: usuariosOnline){
+						
+						System.out.println(onlineUser.toString());
+						
+					}*/
+					
 					misocket.close();
 					
 					}catch (IOException e){
@@ -143,16 +168,98 @@ class LaminaServidor extends JPanel implements Runnable{
 						
 						System.out.println("-----------Error Servidor en reenvio de mensaje a cliente-------------- \n "+e);	
 						
+						
+						
 					}
 			
 
 				}
-	
+			
 	}
 	
-	JTextArea areaTexto;
+	public boolean compruebaOnline(UsuarioOnline user, InetAddress ip){
+		
+		System.out.println("Entra el método compruebaOnline");
+		
+		boolean isOnline=false;
+		
+		if (usuariosOnline.isEmpty()){
+			
+			System.out.println("Array vacío");
+			
+			usuariosOnline.add(user);
+			
+			areaTexto.append(user.getNickName() + " con ip: " + user.getIp() + " ONLINE\n");
+			
+			isOnline=true;
+	
+		}
+		
+		Iterator <UsuarioOnline> it = usuariosOnline.iterator();
+		
+		while (it.hasNext()){
+			
+			UsuarioOnline uo=it.next();
+			
+			if (uo.getIp().equals(ip)){
+				
+				isOnline= true;
+				
+				System.out.println("La ip ya existe");
+		
+			}
+		
+		}
+		
+		return isOnline;
+		
+		
+	}
+	
+
+	private class UsuarioOnline{
+		
+		
+		private String nickName;
+		private InetAddress ip;
+		
+		public UsuarioOnline(String nickName, InetAddress ip){
+			
+			this.nickName=nickName;
+			this.ip=ip;
+			
+		}
+		
+		public String getNickName() {
+			return nickName;
+		}
+		public void setNickName(String nickName) {
+			this.nickName = nickName;
+		}
+
+		public InetAddress getIp() {
+			return ip;
+		}
+
+		public void setIp(InetAddress ip) {
+			this.ip = ip;
+		}
+		
+		public String toString(){
+			
+			return nickName + " con ip: " +ip + " is Online!!";
+		}
+		
+		
+	}
+	
+
 	
 }
+
+
+
+
 
 
 

@@ -1,7 +1,6 @@
 package manel.sockets;
 
-import java.awt.Color;
-import java.awt.Font;
+
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
@@ -42,6 +41,9 @@ class MarcoCliente extends JFrame{
 
 class LaminaCliente extends JPanel{
 	
+	
+	Socket miSocket;
+	Socket avisoSocket;
 	
 	private static final long serialVersionUID = 1L;
 
@@ -84,9 +86,45 @@ class LaminaCliente extends JPanel{
 		Thread t = new Thread(new RecibeTexto());
 		
 		t.start();
+		
+		avisoOnline();
+		
 
-	
 	}
+
+	public void avisoOnline(){
+		
+		ObjectOutputStream envioOnline=null;
+		
+		try {
+			avisoSocket = new Socket("192.168.1.99",9999);
+			
+			PaqueteEnvio avisoOnline = new PaqueteEnvio();
+			
+			avisoOnline.setNick(nick_entrada);
+			
+			avisoOnline.setIp(null);
+			
+			avisoOnline.setMensaje(null);
+			
+			envioOnline=new ObjectOutputStream (avisoSocket.getOutputStream());
+			
+			envioOnline.writeObject(avisoOnline);
+			
+			envioOnline.close();
+			
+			avisoSocket.close();
+			
+		} catch (UnknownHostException e) {
+			System.out.println("Problema en cliente creando avisoOnline");
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.out.println("Problema en cliente creando avisoOnline");
+			e.printStackTrace();
+		}
+		
+	}
+	
 	
 	private class EnviaTexto implements ActionListener{
 
@@ -94,14 +132,10 @@ class LaminaCliente extends JPanel{
 		public void actionPerformed(ActionEvent e) {
 
 
-				
-			
 			try {
 				
 				miSocket=new Socket("192.168.1.99",9999);
-				
-
-				
+			
 				PaqueteEnvio datos=new PaqueteEnvio();
 						
 				datos.setNick(nick_entrada);
@@ -130,7 +164,7 @@ class LaminaCliente extends JPanel{
 			}
 		}
 		
-	Socket miSocket;
+
 		
 	}
 	
@@ -151,9 +185,7 @@ class LaminaCliente extends JPanel{
 				while(true){
 					
 					Socket socket_recepcion=server_recepcion.accept();
-					
-					
-			
+				
 					ObjectInputStream objeto_recibido = new ObjectInputStream (socket_recepcion.getInputStream());
 				
 					paquete_recibido= (PaqueteEnvio) objeto_recibido.readObject();
