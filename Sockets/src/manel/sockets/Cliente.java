@@ -107,6 +107,8 @@ class LaminaCliente extends JPanel{
 			
 			avisoOnline.setMensaje(null);
 			
+			avisoOnline.setOnline(true);
+			
 			envioOnline=new ObjectOutputStream (avisoSocket.getOutputStream());
 			
 			envioOnline.writeObject(avisoOnline);
@@ -143,6 +145,8 @@ class LaminaCliente extends JPanel{
 				datos.setIp(ip.getText());
 				
 				datos.setMensaje(textoEnvio.getText());
+				
+				datos.setOnline(true);
 			
 				ObjectOutputStream paquete_envio = new ObjectOutputStream (miSocket.getOutputStream());
 				
@@ -177,6 +181,7 @@ class LaminaCliente extends JPanel{
 				
 			
 				String nick,ip,mensaje;
+				boolean online;
 				
 				PaqueteEnvio paquete_recibido=new PaqueteEnvio();
 				
@@ -193,6 +198,8 @@ class LaminaCliente extends JPanel{
 					nick=paquete_recibido.getNick();
 					ip=paquete_recibido.getIp();
 					mensaje=paquete_recibido.getMensaje();
+					online=paquete_recibido.getOnline();
+					
 			
 					InetAddress ipHost= InetAddress.getLocalHost();
 				
@@ -234,6 +241,7 @@ class PaqueteEnvio implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	private String nick, ip, mensaje;
+	private boolean online;
 	
 	public PaqueteEnvio(){}
 	
@@ -259,6 +267,18 @@ class PaqueteEnvio implements Serializable{
 
 	public void setMensaje(String mensaje) {
 		this.mensaje = mensaje;
+	}
+
+	public boolean isOnline() {
+		return online;
+	}
+
+	public void setOnline(boolean online) {
+		this.online = online;
+	}
+	
+	public boolean getOnline() {
+		return online;
 	}
 
 

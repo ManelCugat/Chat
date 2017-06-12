@@ -94,6 +94,7 @@ class LaminaServidor extends JPanel implements Runnable{
 				String nick=null;
 				String ip=null;
 				String mensaje=null;
+				boolean online;
 				PaqueteEnvio paquete_recibido=null;
 				InetAddress ipReceptor;
 			
@@ -115,27 +116,27 @@ class LaminaServidor extends JPanel implements Runnable{
 					
 					ipReceptor=misocket.getInetAddress();
 					
-					System.out.println("ip del receptor: " + ipReceptor);
+					online=paquete_recibido.getOnline();
+					
+					//System.out.println("ip del receptor: " + ipReceptor);
 					
 					UsuarioOnline uo=new UsuarioOnline(nick,ipReceptor);
 					
-					System.out.println("Creado usuario: " + uo.getNickName());
 					
-					if (!compruebaOnline(uo,ipReceptor)){
+					if (compruebaOnline(uo,ipReceptor)){
 						
-						areaTexto.append(nick + " con ip: " + ipReceptor + " ONLINE\n");
-						usuariosOnline.add(uo);
-			
-					}else areaTexto.append(nick +": " + mensaje + " para: " + ip + "\n");
+						areaTexto.append(nick +": " + mensaje + " para: " + ip + "\n");
+
+					}
 				
 					
-					/*System.out.println("________ONLINE USERS_______");
+					System.out.println("________ONLINE USERS_______");
 					
 					for (UsuarioOnline onlineUser: usuariosOnline){
 						
 						System.out.println(onlineUser.toString());
 						
-					}*/
+					}
 					
 					misocket.close();
 					
@@ -167,9 +168,7 @@ class LaminaServidor extends JPanel implements Runnable{
 					}catch (IOException e){
 						
 						System.out.println("-----------Error Servidor en reenvio de mensaje a cliente-------------- \n "+e);	
-						
-						
-						
+					
 					}
 			
 
@@ -185,34 +184,67 @@ class LaminaServidor extends JPanel implements Runnable{
 		
 		if (usuariosOnline.isEmpty()){
 			
-			System.out.println("Array vacío");
-			
-			usuariosOnline.add(user);
-			
-			areaTexto.append(user.getNickName() + " con ip: " + user.getIp() + " ONLINE\n");
-			
-			isOnline=true;
-	
-		}
+			isOnline=false;
 		
-		Iterator <UsuarioOnline> it = usuariosOnline.iterator();
+		}else {
 		
-		while (it.hasNext()){
+			Iterator <UsuarioOnline> it = usuariosOnline.iterator();
+		
+			while (it.hasNext()){
 			
 			UsuarioOnline uo=it.next();
 			
-			if (uo.getIp().equals(ip)){
+				if (uo.getIp().equals(ip)){
 				
-				isOnline= true;
+					isOnline= true;
 				
-				System.out.println("La ip ya existe");
+					System.out.println("La ip ya existe");
+		
+				}
 		
 			}
+		}
 		
+		if (!isOnline){
+	
+			areaTexto.append(user.getNickName() + " con ip: " + user.getIp() + " ONLINE\n");
+			usuariosOnline.add(user);
+			
 		}
 		
 		return isOnline;
 		
+		
+	}
+	
+
+	
+	private class PaqueteUsuariosOnline implements Serializable{
+		
+		private ArrayList <UsuarioOnline> uo = new ArrayList <UsuarioOnline>();
+	
+		public PaqueteUsuariosOnline (ArrayList <UsuarioOnline> uo){
+		
+			this.setUo(uo);
+			
+		}
+		
+		
+		public ArrayList <UsuarioOnline> arrayUsuariosOnline(){
+		
+			return getUo();
+			
+		}
+	
+
+		public ArrayList <UsuarioOnline> getUo() {
+			return uo;
+		}
+
+		public void setUo(ArrayList <UsuarioOnline> uo) {
+			this.uo = uo;
+		}
+	
 		
 	}
 	
@@ -253,9 +285,10 @@ class LaminaServidor extends JPanel implements Runnable{
 		
 	}
 	
-
-	
 }
+
+
+
 
 
 
